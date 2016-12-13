@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		51BDCEA56005DF8A225640D2 /* libPods-Broadcast.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A173738892CAD0202596E92 /* libPods-Broadcast.a */; };
-		5A672C94CE0699C38AC5241F /* libPods-PerchBroadcastExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B2FCEB3EBD9A13907433313F /* libPods-PerchBroadcastExample.a */; };
 		77FC74950D3A68F11C4F0855 /* libPods-PerchBroadcastTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9AD2C57D55186303476776FE /* libPods-PerchBroadcastTests.a */; };
 		8AF5EF9C51ED1916744CFBFE /* libPods-PerchBroadcastExampleTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 78E449AF0F398C8CFE3569D5 /* libPods-PerchBroadcastExampleTests.a */; };
 		A0C54DF2B863C97B34CA817E /* libPods-BroadcastMock.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E84F2D1C5261A3CDFE342CA3 /* libPods-BroadcastMock.a */; };
@@ -87,7 +86,6 @@
 		D98477471C3C7759004DB872 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D98477561C3C9002004DB872 /* PerchAPIClientTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PerchAPIClientTests.m; sourceTree = "<group>"; };
 		D9ED28571C3F0E5100ECE9A5 /* BroadcastMock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BroadcastMock.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		D9ED28581C3F0E5100ECE9A5 /* PerchBroadcastExample copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "PerchBroadcastExample copy-Info.plist"; path = "/Users/chrisbal/Documents/Perch/PerchBroadcast-iOS-SDK/Example/PerchBroadcastExample copy-Info.plist"; sourceTree = "<absolute>"; };
 		D9ED28591C3F0F8600ECE9A5 /* MockAPIClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MockAPIClient.h; sourceTree = "<group>"; };
 		D9ED285A1C3F0F8600ECE9A5 /* MockAPIClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MockAPIClient.m; sourceTree = "<group>"; };
 		E272F11A4FEDD800F206CBA2 /* Pods-PerchBroadcastTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PerchBroadcastTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PerchBroadcastTests/Pods-PerchBroadcastTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -101,7 +99,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5A672C94CE0699C38AC5241F /* libPods-PerchBroadcastExample.a in Frameworks */,
 				51BDCEA56005DF8A225640D2 /* libPods-Broadcast.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -179,7 +176,6 @@
 				D98477291C3C7759004DB872 /* Products */,
 				B7488DB8AE4C2C706C467DD9 /* Pods */,
 				5CC325A545B52E67D6E84A92 /* Frameworks */,
-				D9ED28581C3F0E5100ECE9A5 /* PerchBroadcastExample copy-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -245,12 +241,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = D984774A1C3C7759004DB872 /* Build configuration list for PBXNativeTarget "Broadcast" */;
 			buildPhases = (
-				7850CE2CFC99819F12490242 /* Check Pods Manifest.lock */,
+				7850CE2CFC99819F12490242 /* [CP] Check Pods Manifest.lock */,
 				D98477241C3C7759004DB872 /* Sources */,
 				D98477251C3C7759004DB872 /* Frameworks */,
 				D98477261C3C7759004DB872 /* Resources */,
-				B2F54A2225054FECD72B551B /* Embed Pods Frameworks */,
-				0A72CEFEF327EC9F97865B00 /* Copy Pods Resources */,
+				B2F54A2225054FECD72B551B /* [CP] Embed Pods Frameworks */,
+				0A72CEFEF327EC9F97865B00 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -265,12 +261,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = D984774D1C3C7759004DB872 /* Build configuration list for PBXNativeTarget "PerchBroadcastTests" */;
 			buildPhases = (
-				474F38A743573B26177B401D /* Check Pods Manifest.lock */,
+				474F38A743573B26177B401D /* [CP] Check Pods Manifest.lock */,
 				D984773D1C3C7759004DB872 /* Sources */,
 				D984773E1C3C7759004DB872 /* Frameworks */,
 				D984773F1C3C7759004DB872 /* Resources */,
-				61DA5F33434868E50CD1E303 /* Embed Pods Frameworks */,
-				543B6B73F0DC685DE971A79C /* Copy Pods Resources */,
+				61DA5F33434868E50CD1E303 /* [CP] Embed Pods Frameworks */,
+				543B6B73F0DC685DE971A79C /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -286,12 +282,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = D9ED28541C3F0E5100ECE9A5 /* Build configuration list for PBXNativeTarget "BroadcastMock" */;
 			buildPhases = (
-				D9ED28471C3F0E5100ECE9A5 /* Check Pods Manifest.lock */,
+				D9ED28471C3F0E5100ECE9A5 /* [CP] Check Pods Manifest.lock */,
 				D9ED28481C3F0E5100ECE9A5 /* Sources */,
 				D9ED284C1C3F0E5100ECE9A5 /* Frameworks */,
 				D9ED284E1C3F0E5100ECE9A5 /* Resources */,
-				D9ED28521C3F0E5100ECE9A5 /* Embed Pods Frameworks */,
-				D9ED28531C3F0E5100ECE9A5 /* Copy Pods Resources */,
+				D9ED28521C3F0E5100ECE9A5 /* [CP] Embed Pods Frameworks */,
+				D9ED28531C3F0E5100ECE9A5 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -313,6 +309,7 @@
 				TargetAttributes = {
 					D98477271C3C7759004DB872 = {
 						CreatedOnToolsVersion = 7.2;
+						DevelopmentTeam = 44TWSXDT98;
 					};
 					D98477401C3C7759004DB872 = {
 						CreatedOnToolsVersion = 7.2;
@@ -371,14 +368,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		0A72CEFEF327EC9F97865B00 /* Copy Pods Resources */ = {
+		0A72CEFEF327EC9F97865B00 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Copy Pods Resources";
+			name = "[CP] Copy Pods Resources";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -386,29 +383,29 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Broadcast/Pods-Broadcast-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		474F38A743573B26177B401D /* Check Pods Manifest.lock */ = {
+		474F38A743573B26177B401D /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Check Pods Manifest.lock";
+			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
-		543B6B73F0DC685DE971A79C /* Copy Pods Resources */ = {
+		543B6B73F0DC685DE971A79C /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Copy Pods Resources";
+			name = "[CP] Copy Pods Resources";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -416,14 +413,14 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-PerchBroadcastTests/Pods-PerchBroadcastTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		61DA5F33434868E50CD1E303 /* Embed Pods Frameworks */ = {
+		61DA5F33434868E50CD1E303 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Embed Pods Frameworks";
+			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -431,29 +428,29 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-PerchBroadcastTests/Pods-PerchBroadcastTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		7850CE2CFC99819F12490242 /* Check Pods Manifest.lock */ = {
+		7850CE2CFC99819F12490242 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Check Pods Manifest.lock";
+			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
-		B2F54A2225054FECD72B551B /* Embed Pods Frameworks */ = {
+		B2F54A2225054FECD72B551B /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Embed Pods Frameworks";
+			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -461,29 +458,29 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Broadcast/Pods-Broadcast-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		D9ED28471C3F0E5100ECE9A5 /* Check Pods Manifest.lock */ = {
+		D9ED28471C3F0E5100ECE9A5 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Check Pods Manifest.lock";
+			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
-		D9ED28521C3F0E5100ECE9A5 /* Embed Pods Frameworks */ = {
+		D9ED28521C3F0E5100ECE9A5 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Embed Pods Frameworks";
+			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -491,14 +488,14 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-BroadcastMock/Pods-BroadcastMock-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		D9ED28531C3F0E5100ECE9A5 /* Copy Pods Resources */ = {
+		D9ED28531C3F0E5100ECE9A5 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Copy Pods Resources";
+			name = "[CP] Copy Pods Resources";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -668,6 +665,7 @@
 			baseConfigurationReference = 27FAEECA55187A5119426E34 /* Pods-Broadcast.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = 44TWSXDT98;
 				INFOPLIST_FILE = PerchBroadcastExample/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -681,6 +679,7 @@
 			baseConfigurationReference = 24768CB052737207E6DDFFE9 /* Pods-Broadcast.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = 44TWSXDT98;
 				INFOPLIST_FILE = PerchBroadcastExample/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

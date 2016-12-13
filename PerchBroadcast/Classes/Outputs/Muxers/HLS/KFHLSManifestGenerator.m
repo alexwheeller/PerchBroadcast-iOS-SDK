@@ -127,7 +127,8 @@
         [manifest appendString:[self.segments objectForKey:key]];
     }
     
-    [manifest appendString:[self footer]];
+    if (self.finished)
+        [manifest appendString:[self footer]];
     
     DDLogVerbose(@"Latest manifest:\n%@", manifest);
     

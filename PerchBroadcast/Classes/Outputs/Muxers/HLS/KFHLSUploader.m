@@ -71,8 +71,8 @@ static NSString * const kKFS3Key = @"kKFS3Key";
         _uploadRateTotal = 0;
         _uploadRateCount = 0;
         
-        if ([stream.endpoint conformsToProtocol:@protocol(BroadcastS3Endpoint)]) {
-            id<BroadcastS3Endpoint> s3Endpoint = (id<BroadcastS3Endpoint>)stream.endpoint;
+        if ([stream/*.endpoint*/ conformsToProtocol:@protocol(BroadcastS3Endpoint)]) {
+            id<BroadcastS3Endpoint> s3Endpoint = (id<BroadcastS3Endpoint>)stream;//.endpoint;
             AWSRegionType region = [KFAWSCredentialsProvider regionTypeForRegion:s3Endpoint.awsRegion];
             KFAWSCredentialsProvider *awsCredentialsProvider = [[KFAWSCredentialsProvider alloc] initWithEndpoint:s3Endpoint];
             AWSServiceConfiguration *configuration = [[AWSServiceConfiguration alloc] initWithRegion:region
@@ -84,8 +84,10 @@ static NSString * const kKFS3Key = @"kKFS3Key";
             self.transferManager = [AWSS3TransferManager S3TransferManagerForKey:kKFS3TransferManagerKey];
             self.s3 = [AWSS3 S3ForKey:kKFS3Key];
             
+            //[self deleteOldFiles];
+            
 #warning hardcoded videoSize value
-            self.manifestGenerator = [[KFHLSManifestGenerator alloc] initWithTargetDuration:10 playlistType:KFHLSManifestPlaylistTypeVOD videoSize:CGSizeMake(1280.0, 720.0)];
+            self.manifestGenerator = [[KFHLSManifestGenerator alloc] initWithTargetDuration:10 playlistType:KFHLSManifestPlaylistTypeVOD videoSize:CGSizeMake(570,320)];//1280.0, 720.0)];
         } else {
             NSAssert(NO, @"Only S3 uploads are supported at this time");
         }
@@ -133,7 +135,7 @@ static NSString * const kKFS3Key = @"kKFS3Key";
     
     [_files setObject:kUploadStateUploading forKey:fileName];
     NSString *filePath = [_directoryPath stringByAppendingPathComponent:fileName];
-    id<BroadcastS3Endpoint> s3Endpoint = (id<BroadcastS3Endpoint>)self.stream.endpoint;
+    id<BroadcastS3Endpoint> s3Endpoint = (id<BroadcastS3Endpoint>)self.stream;//.endpoint;
 	NSString *key = [self awsKeyForStream:self.stream fileName:fileName];
     
     AWSS3TransferManagerUploadRequest *uploadRequest = [AWSS3TransferManagerUploadRequest new];
@@ -186,8 +188,8 @@ static NSString * const kKFS3Key = @"kKFS3Key";
 }
 
 - (NSString*) awsKeyForStream:(id<BroadcastStream>)stream fileName:(NSString*)fileName {
-    if ([stream.endpoint conformsToProtocol:@protocol(BroadcastS3Endpoint)]) {
-        id<BroadcastS3Endpoint> s3Endpoint = (id<BroadcastS3Endpoint>)stream.endpoint;
+    if ([stream/*.endpoint*/ conformsToProtocol:@protocol(BroadcastS3Endpoint)]) {
+        id<BroadcastS3Endpoint> s3Endpoint = (id<BroadcastS3Endpoint>)stream;//.endpoint;
         return [NSString stringWithFormat:@"%@%@", s3Endpoint.awsPrefix, fileName];
     } else {
         NSAssert(NO, @"unsupported endpoint type");
@@ -200,7 +202,7 @@ static NSString * const kKFS3Key = @"kKFS3Key";
     DDLogVerbose(@"New manifest:\n%@", manifestString);
     NSString *key = [self awsKeyForStream:self.stream fileName:manifestName];
     
-    id<BroadcastS3Endpoint> s3Endpoint = (id<BroadcastS3Endpoint>)self.stream.endpoint;
+    id<BroadcastS3Endpoint> s3Endpoint = (id<BroadcastS3Endpoint>)self.stream;//.endpoint;
     AWSS3PutObjectRequest *uploadRequest = [AWSS3TransferManagerUploadRequest new];
     uploadRequest.bucket = s3Endpoint.bucketName;
     uploadRequest.key = key;
@@ -272,7 +274,7 @@ static NSString * const kKFS3Key = @"kKFS3Key";
         NSString *key = [self awsKeyForStream:self.stream fileName:fileName];
         
         AWSS3TransferManagerUploadRequest *uploadRequest = [AWSS3TransferManagerUploadRequest new];
-        id<BroadcastS3Endpoint> s3Endpoint = (id<BroadcastS3Endpoint>)self.stream.endpoint;
+        id<BroadcastS3Endpoint> s3Endpoint = (id<BroadcastS3Endpoint>)self.stream;//.endpoint;
         uploadRequest.bucket = s3Endpoint.bucketName;
         uploadRequest.key = key;
         uploadRequest.body = [NSURL fileURLWithPath:filePath];
@@ -331,7 +333,7 @@ static NSString * const kKFS3Key = @"kKFS3Key";
     if (self.useSSL) {
         ssl = @"s";
     }
-    id<BroadcastS3Endpoint> s3Endpoint = (id<BroadcastS3Endpoint>)self.stream.endpoint;
+    id<BroadcastS3Endpoint> s3Endpoint = (id<BroadcastS3Endpoint>)self.stream;//.endpoint;
     NSString *urlString = [NSString stringWithFormat:@"http%@://%@.s3.amazonaws.com/%@", ssl, s3Endpoint.bucketName, key];
     return [NSURL URLWithString:urlString];
 }
@@ -465,6 +467,53 @@ static NSString * const kKFS3Key = @"kKFS3Key";
         DDLogError(@"Failed to upload request, requeuing %@: %@", fileName, error.description);
         [self uploadNextSegment];
     });
+}
+
+-(void)deleteOldFiles {
+    
+    NSString *key = [self awsKeyForStream:self.stream fileName:@""];
+    id<BroadcastS3Endpoint> s3Endpoint = (id<BroadcastS3Endpoint>)self.stream;//.endpoint;
+    
+    AWSS3ListObjectsRequest *listRequest = [AWSS3ListObjectsRequest new];
+    
+    listRequest.bucket = s3Endpoint.bucketName;
+    listRequest.prefix = s3Endpoint.awsPrefix;
+
+    [[[self.s3 listObjects:listRequest] continueWithBlock:^id(AWSTask *task) {
+        if(task.error != nil){
+            if(task.error.code != AWSS3TransferManagerErrorCancelled && task.error.code != AWSS3TransferManagerErrorPaused){
+                NSLog(@"%s Error: [%@]",__PRETTY_FUNCTION__, task.error);
+            }
+        }else{
+            
+            AWSS3DeleteObjectsRequest *deleteRequest = [AWSS3DeleteObjectsRequest new];
+            
+            deleteRequest.bucket = s3Endpoint.bucketName;
+            AWSS3Remove* remove = [AWSS3Remove new];
+            remove.quiet = @(1);
+            remove.objects = ((AWSS3ListObjectsOutput*)task.result).contents;
+            deleteRequest.remove = remove;
+            
+            //NSString *key = [self awsKeyForStream:self.stream fileName:@""];
+            //deleteRequest.key = key;
+            
+            [[[self.s3 deleteObjects:deleteRequest] continueWithBlock:^id(AWSTask *task) {
+                if(task.error != nil){
+                    if(task.error.code != AWSS3TransferManagerErrorCancelled && task.error.code != AWSS3TransferManagerErrorPaused){
+                        NSLog(@"%s Error: [%@]",__PRETTY_FUNCTION__, task.error);
+                    }
+                }else{
+                    return task;
+                }
+                return nil;
+            }] waitUntilFinished];
+            
+            return task;
+        }
+        return nil;
+    }] waitUntilFinished];
+    
+    
 }
 
 @end

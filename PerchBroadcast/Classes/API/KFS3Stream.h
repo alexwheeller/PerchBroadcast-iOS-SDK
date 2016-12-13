@@ -13,4 +13,12 @@ extern NSString * const KFS3StreamType;
 
 @interface KFS3Stream : KFStream <BroadcastS3Endpoint>
 
+@property (nonatomic, strong) NSString *bucketName;
+@property (nonatomic, strong) NSString *awsAccessKey;
+@property (nonatomic, strong) NSString *awsSecretKey;
+@property (nonatomic, strong) NSString *awsSessionToken;
+@property (nonatomic, strong) NSDate *awsExpirationDate;
+@property (nonatomic, strong) NSString *awsPrefix;
+@property (nonatomic, strong) NSString *awsRegion;
+
 @end

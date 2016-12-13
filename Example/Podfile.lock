@@ -45,8 +45,7 @@ PODS:
     - AWSCore
     - AWSS3 (~> 2.1)
     - CocoaLumberjack (~> 1.0)
-    - FFmpeg
-    - FFmpegWrapper
+    - FFmpegWrapper (~> 1.0)
     - FormatterKit/TimeIntervalFormatter (~> 1.4)
     - Mantle (~> 1.4)
     - PureLayout (~> 2.0)
@@ -74,7 +73,7 @@ DEPENDENCIES:
 
 EXTERNAL SOURCES:
   PerchBroadcast:
-    :path: "../"
+    :path: ../
 
 SPEC CHECKSUMS:
   AFNetworking: cb8d14a848e831097108418f5d49217339d4eb60
@@ -86,11 +85,13 @@ SPEC CHECKSUMS:
   FFmpegWrapper: 9a932581137d17203e842ce942e171158336ae16
   FormatterKit: bddde83e054edf9d9ee14f9de3b3a5103db256f4
   Mantle: a197db93e0f1e36194b1fdbc078219a8492eaef2
-  PerchBroadcast: 939d76dc2f1479805e431b4b6fec4d1223796909
+  PerchBroadcast: eed4a5bd40afe863e490f98c26ea1f4d050a6974
   PureLayout: f25f0bb904d5ccfe6e31da3cb869185259f02e0d
   SDWebImage: 1d2b1a1efda1ade1b00b6f8498865f8ddedc8a84
   SOCKit: c7376ac262bea9115b8f749358f762522a47d392
   SSKeychain: 04c4ec40f4c3deda524e269bc76e5f30e638a174
   URLMock: ef4a83849b7fe1a5fe11483d2c88fb62aab03f81
 
-COCOAPODS: 0.39.0
+PODFILE CHECKSUM: 859041a934e7fd5f0f41594971f11ef3976d7a3f
+
+COCOAPODS: 1.1.0.rc.2

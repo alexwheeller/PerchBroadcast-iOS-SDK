@@ -43,7 +43,7 @@
     MockAPIClient *apiClient = [[MockAPIClient alloc] init];
 #else
     //PerchAPIClient *apiClient = [[PerchAPIClient alloc] initWithBaseURL:[NSURL URLWithString:@"https://perchlive.com/api/v1/"]];
-    PerchAPIClient *apiClient = [[PerchAPIClient alloc] initWithBaseURL:[NSURL URLWithString:@"http://10.11.41.186:8000/api/"]];
+    /*PerchAPIClient *apiClient = [[PerchAPIClient alloc] initWithBaseURL:[NSURL URLWithString:@"http://10.11.41.186:8000/api/"]];
     NSString *email = [NSString stringWithFormat:@"%@@asdf.com", [self randomUsername]];
     [apiClient createUserWithEmail:email password:@"asdf" callbackBlock:^(NSString *apiToken, NSError *error) {
         if (apiToken) {
@@ -51,10 +51,10 @@
         } else {
             NSLog(@"error: %@", error);
         }
-    }];
+    }];*/
 
 #endif
-    KFBroadcastViewController *broadcaster = [[KFBroadcastViewController alloc] initWithAPIClient:apiClient];
+    KFBroadcastViewController *broadcaster = [[KFBroadcastViewController alloc] initWithAPIClient:nil];
     [self presentViewController:broadcaster animated:YES completion:nil];
 }
 @end

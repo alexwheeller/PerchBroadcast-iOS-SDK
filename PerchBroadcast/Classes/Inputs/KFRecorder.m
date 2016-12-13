@@ -19,6 +19,8 @@
 #import "KFVideoFrame.h"
 #import "Endian.h"
 
+#import "BroadcastStream.h"
+
 @interface KFRecorder()
 @property (nonatomic) double minBitrate;
 @property (nonatomic) BOOL hasScreenshot;
@@ -36,7 +38,7 @@
 
 - (instancetype) initWithAPIClient:(id<BroadcastAPIClient>)apiClient {
     if (self = [super init]) {
-        NSParameterAssert(apiClient != nil);
+        //NSParameterAssert(apiClient != nil);
         _apiClient = apiClient;
         _hlsMonitor = [[KFHLSMonitor alloc] initWithAPIClient:apiClient];
         _minBitrate = 300 * 1000;
@@ -74,8 +76,8 @@
 
 - (void) setupEncoders {
     self.audioSampleRate = 44100;
-    self.videoHeight = 720;
-    self.videoWidth = 1280;
+    self.videoHeight = 320;//720;
+    self.videoWidth = 570;//1280;
     int audioBitrate = 64 * 1000; // 64 Kbps
     int maxBitrate = self.maxBitrate;
     int videoBitrate = maxBitrate - audioBitrate;
@@ -117,7 +119,8 @@
 
 - (void) setupVideoCapture {
     NSError *error = nil;
-    AVCaptureDevice* videoDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+    //AVCaptureDevice* videoDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+    AVCaptureDevice *videoDevice = [self frontCamera];
     AVCaptureDeviceInput* videoInput = [AVCaptureDeviceInput deviceInputWithDevice:videoDevice error:&error];
     if (error) {
         NSLog(@"Error getting video input device: %@", error.description);
@@ -137,6 +140,16 @@
         [_session addOutput:_videoOutput];
     }
     _videoConnection = [_videoOutput connectionWithMediaType:AVMediaTypeVideo];
+}
+
+- (AVCaptureDevice *)frontCamera {
+    NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
+    for (AVCaptureDevice *device in devices) {
+        if ([device position] == AVCaptureDevicePositionFront) {
+            return device;
+        }
+    }
+    return nil;
 }
 
 - (void)setVideoOrientation:(AVCaptureVideoOrientation)videoOrientation {
@@ -231,8 +244,36 @@
 }
 
 - (void) startRecording {
+    
+    KFS3Stream* s3Endpoint = [[KFS3Stream alloc] init];
+    s3Endpoint.streamID = @"22";
+    //s3Endpoint.awsSessionToken;
+    s3Endpoint.awsExpirationDate = [NSDate dateWithTimeIntervalSinceNow:3600];
+    s3Endpoint.awsPrefix= @"13/";
+    s3Endpoint.awsRegion = @"eu-west-1";
+    
+    self.stream = s3Endpoint;
+    
+    s3Endpoint.streamState = KFStreamStateStreaming;
+    [self setupHLSWriterWithStream:self.stream];
+    
+    [self.hlsMonitor startMonitoringFolderPath:_hlsWriter.directoryPath stream:self.stream delegate:self];
+    
+    NSError* error;
+    
+    [_hlsWriter prepareForWriting:&error];
+    if (error) {
+        DDLogError(@"Error preparing for writing: %@", error);
+    }
+    self.isRecording = YES;
+    if (self.delegate && [self.delegate respondsToSelector:@selector(recorderDidStartRecording:error:)]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.delegate recorderDidStartRecording:self error:nil];
+        });
+    }
+
     [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
-    self.locationManager = [[CLLocationManager alloc] init];
+    /*self.locationManager = [[CLLocationManager alloc] init];
     self.locationManager.delegate = self;
     [self.locationManager startUpdatingLocation];
     [self.apiClient startNewStream:^(id<BroadcastStream> endpointResponse, NSError *error) {
@@ -264,7 +305,7 @@
                 [self.delegate recorderDidStartRecording:self error:nil];
             });
         }
-    }];
+    }];*/
     
 }
 

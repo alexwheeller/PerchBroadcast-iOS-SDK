@@ -111,4 +111,7 @@ extern NSString * const KFStreamTypeKey;
  *  Native object for serialized /api/stream responses
  */
 @interface KFStream : MTLModel <MTLJSONSerializing, KFStream>
+@property (nonatomic, strong/*, readonly*/) NSString *streamID;
+@property (nonatomic) KFStreamState streamState;
+@property (nonatomic, strong) NSURL *thumbnailURL;
 @end

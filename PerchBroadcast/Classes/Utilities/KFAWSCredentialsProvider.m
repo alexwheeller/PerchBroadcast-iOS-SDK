@@ -61,8 +61,8 @@
 
 #pragma mark - New Credentials Provider
 
-- (AWSTask<AWSCredentials *> *)credentials {
-    return [AWSTask taskWithResult:[[AWSCredentials alloc]
+/*- (AWSTask<AWSSTSCredentials *> *)credentials {
+    return [AWSTask taskWithResult:[[AWSSTSCredentials alloc] ini
         initWithAccessKey:self.accessKey
         secretKey:self.secretKey
         sessionKey:self.sessionKey
@@ -71,6 +71,6 @@
 
 - (void)invalidateCachedTemporaryCredentials {
     // NOOP
-}
+}*/
 
 @end
