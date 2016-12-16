@@ -7,7 +7,8 @@
 //
 
 #import "KFHLSMonitor.h"
-#import "KFHLSUploader.h"
+//#import "KFHLSUploader.h"
+#import "AKHLSUploader.h"
 #import "KFLog.h"
 
 @interface KFHLSMonitor()
@@ -31,7 +32,8 @@ static KFHLSMonitor *_sharedMonitor = nil;
 
 - (void) startMonitoringFolderPath:(NSString*)path stream:(id<BroadcastStream>)stream delegate:(id<KFHLSUploaderDelegate>)delegate {
     dispatch_async(self.monitorQueue, ^{
-        KFHLSUploader *hlsUploader = [[KFHLSUploader alloc] initWithDirectoryPath:path stream:stream apiClient:self.apiClient];
+        //KFHLSUploader *hlsUploader = [[KFHLSUploader alloc] initWithDirectoryPath:path stream:stream apiClient:self.apiClient];
+        AKHLSUploader *hlsUploader = [[AKHLSUploader alloc] initWithDirectoryPath:path stream:stream];
         hlsUploader.delegate = delegate;
         [self.hlsUploaders setObject:hlsUploader forKey:path];
     });

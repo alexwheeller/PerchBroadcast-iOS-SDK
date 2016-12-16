@@ -48,6 +48,8 @@ static NSString * const kKFS3Key = @"kKFS3Key";
 @property (nonatomic) BOOL hasUploadedFinalManifest;
 @property (nonatomic) double uploadRateTotal;
 @property (nonatomic) double uploadRateCount;
+
+@property (nonatomic, strong) NSString *manifestStringLong;
 @end
 
 @implementation KFHLSUploader
@@ -88,6 +90,7 @@ static NSString * const kKFS3Key = @"kKFS3Key";
             
 #warning hardcoded videoSize value
             self.manifestGenerator = [[KFHLSManifestGenerator alloc] initWithTargetDuration:10 playlistType:KFHLSManifestPlaylistTypeVOD videoSize:CGSizeMake(570,320)];//1280.0, 720.0)];
+            self.manifestGeneratorLive = [[KFHLSManifestGenerator alloc] initWithTargetDuration:10 playlistType:KFHLSManifestPlaylistTypeLive videoSize:CGSizeMake(570,320)];//1280.0, 720.0)];
         } else {
             NSAssert(NO, @"Only S3 uploads are supported at this time");
         }
@@ -254,6 +257,7 @@ static NSString * const kKFS3Key = @"kKFS3Key";
                 NSString *manifestSnapshot = [self manifestSnapshot];
                 
                 [self.manifestGenerator appendFromLiveManifest:manifestSnapshot];
+                [self.manifestGeneratorLive appendFromLiveManifest:manifestSnapshot];
                 NSUInteger segmentIndex = [self indexForFilePrefix:filePrefix];
                 NSMutableDictionary *segmentInfo = [[NSMutableDictionary alloc] initWithDictionary:@{kManifestKey: manifestSnapshot,
                                                                                                      kFileNameKey: fileName }];
@@ -262,7 +266,7 @@ static NSString * const kKFS3Key = @"kKFS3Key";
                 [self uploadNextSegment];
             }
         } else if ([fileExtension isEqualToString:@"jpg"]) {
-            [self uploadThumbnail:fileName];
+            //[self uploadThumbnail:fileName];
         }
     }];
 }
@@ -400,8 +404,35 @@ static NSString * const kKFS3Key = @"kKFS3Key";
             [_queuedSegments removeObjectForKey:@(_nextSegmentIndexToUpload)];
             NSUInteger queuedSegmentsCount = _queuedSegments.count;
             
+            //if (!self.manifestStringLong) {
+            //    self.manifestStringLong = [self fetchManifestSnapshotFromFile];
+            //}
+            
+            /*NSString *manifestSnapshot = [self manifestSnapshot];
+            NSArray* lines = [manifestSnapshot componentsSeparatedByString:@"\n"];
+            for (NSString* l in lines) {
+                if ([l hasPrefix:@"#EXT-X-MEDIA-SEQUENCE"] || [l hasPrefix:@"#EXT-X-TARGETDURATION"]){
+                    continue;
+                }
+                
+                if (![self.manifestStringLong containsString:l])
+                    self.manifestStringLong = [NSString stringWithFormat:@"%@%@\n", self.manifestStringLong, l];
+            }
+            
+            NSLog(self.manifestStringLong);*/
+            
+            /*NSString* mnf = [self.manifestGenerator manifestString];
+            NSString* mnfss = [self manifestSnapshot];
+            NSString* mnfsq = [self.manifestGenerator manifestStringAtMediaSequence:0];*/
+            
+            self.manifestStringLong = [self.manifestGeneratorLive manifestStringAtMediaSequence:0];
+            
+            NSLog(self.manifestStringLong);
+            
+            
             // Live
-            [self updateManifestWithString:[self manifestSnapshot] manifestName:kLiveManifestFileName];
+            //[self updateManifestWithString:[self manifestSnapshot] manifestName:kLiveManifestFileName];
+            [self updateManifestWithString:self.manifestStringLong manifestName:kLiveManifestFileName];
             
             // Incremental VOD updates
             

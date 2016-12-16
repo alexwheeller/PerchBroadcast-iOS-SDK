@@ -32,6 +32,7 @@
 @property (nonatomic, strong) id<BroadcastStream> stream;
 @property (nonatomic) BOOL useSSL;
 @property (nonatomic, strong) KFHLSManifestGenerator *manifestGenerator;
+@property (nonatomic, strong) KFHLSManifestGenerator *manifestGeneratorLive;
 @property (nonatomic, strong) id<BroadcastAPIClient> apiClient;
 
 - (id) initWithDirectoryPath:(NSString*)directoryPath stream:(id<BroadcastStream>)stream apiClient:(id<BroadcastAPIClient>)apiClient;
