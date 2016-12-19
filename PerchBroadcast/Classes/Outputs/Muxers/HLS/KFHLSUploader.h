@@ -16,7 +16,7 @@
 
 @protocol KFHLSUploaderDelegate <NSObject>
 @optional
-- (void) uploader:(KFHLSUploader*)uploader didUploadSegmentAtURL:(NSURL*)segmentURL uploadSpeed:(double)uploadSpeed numberOfQueuedSegments:(NSUInteger)numberOfQueuedSegments; //KBps
+- (void) uploader:(NSObject*)uploader didUploadSegmentAtURL:(NSURL*)segmentURL uploadSpeed:(double)uploadSpeed numberOfQueuedSegments:(NSUInteger)numberOfQueuedSegments; //KBps
 - (void) uploader:(KFHLSUploader *)uploader liveManifestReadyAtURL:(NSURL*)manifestURL;
 - (void) uploader:(KFHLSUploader *)uploader vodManifestReadyAtURL:(NSURL*)manifestURL;
 - (void) uploader:(KFHLSUploader *)uploader thumbnailReadyAtURL:(NSURL*)manifestURL;

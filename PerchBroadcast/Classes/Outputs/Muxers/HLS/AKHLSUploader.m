@@ -33,6 +33,8 @@ static NSString * const kUploadStateFailed = @"failed";
 static NSString * const kKFS3TransferManagerKey = @"kKFS3TransferManagerKey";
 static NSString * const kKFS3Key = @"kKFS3Key";
 
+//static int const kSequenceLength = 3;
+
 
 @interface AKHLSManifest : NSObject
     @property (nonatomic) NSInteger version;
@@ -82,7 +84,8 @@ static NSString * const kKFS3Key = @"kKFS3Key";
     [res appendFormat:@"#EXT-X-MEDIA-SEQUENCE:%d\n", self.mediaSequence];
     
     for (NSDictionary* s in self.segments) {
-        [res appendFormat:@"#EXTINF:%@,\n%@\n", [s objectForKey:kDurationKey], [s objectForKey:kFileNameKey]];
+        if ([[s objectForKey:kUploadStatusKey] isEqualToString:kUploadStateFinished])
+            [res appendFormat:@"#EXTINF:%@,\n%@\n", [s objectForKey:kDurationKey], [s objectForKey:kFileNameKey]];
     }
     
     if (_finished) {
@@ -92,7 +95,45 @@ static NSString * const kKFS3Key = @"kKFS3Key";
     return res;
 }
 
-- (void) appendSegmentsFromString: (NSString*) string {
+- (NSString*) toStringForSeq: (int) seq {
+    NSMutableString* head = [[NSMutableString alloc] initWithCapacity:100];
+    NSMutableString* body = [[NSMutableString alloc] initWithCapacity:100];
+    
+    
+    int dur = 0;
+    int count = 0;
+    
+    for (int i = seq; i < MIN(self.segments.count, seq+3); i++) {
+        NSDictionary* s = self.segments[i];
+        if ([[s objectForKey:kUploadStatusKey] isEqualToString:kUploadStateFinished]) {
+            [body appendFormat:@"#EXTINF:%@,\n%@\n", [s objectForKey:kDurationKey], [s objectForKey:kFileNameKey]];
+            
+            
+            int d = ceil([[s objectForKey:kDurationKey] doubleValue]);
+            if (dur < d)
+                dur = d;
+            
+            if (i == seq)
+                self.mediaSequence = [AKHLSManifest segmentIndex:[s objectForKey:kFileNameKey]];
+            
+            //count++;
+            //if (count == kSequenceLength)
+            //    break;
+        }
+    }
+    
+    if (_finished) {
+        [body appendString:@"#EXT-X-ENDLIST\n"];
+    }
+    
+    [head appendFormat:@"#EXTM3U\n#EXT-X-VERSION:%d\n", self.version];
+    [head appendFormat:@"#EXT-X-TARGETDURATION:%d\n", dur];
+    [head appendFormat:@"#EXT-X-MEDIA-SEQUENCE:%d\n", seq];
+    
+    return [head stringByAppendingString:body];
+}
+
+- (void) updateFromString: (NSString*) string {
     NSArray* parts = [string componentsSeparatedByString:@"#EXTINF:"];
     
     NSArray* headers = [parts[0] componentsSeparatedByString:@"\n"];
@@ -103,15 +144,15 @@ static NSString * const kKFS3Key = @"kKFS3Key";
         }*/
         
         if ([h hasPrefix:@"#EXT-X-TARGETDURATION:"]) {
-            NSInteger nd = [h componentsSeparatedByString:@":"][1].integerValue;
+            //self.targetDuration/*NSInteger nd*/ = [h componentsSeparatedByString:@":"][1].integerValue;
             
-            if (self.targetDuration < nd)
-                self.targetDuration = nd;
+            //if (self.targetDuration < nd)
+              //  self.targetDuration = nd;
         }
         
-        /*if ([h hasPrefix:@"#EXT-X-MEDIA-SEQUENCE:"]) {
-            self.mediaSequence = [h componentsSeparatedByString:@":"][1].integerValue;
-        }*/
+        if ([h hasPrefix:@"#EXT-X-MEDIA-SEQUENCE:"]) {
+        //    self.mediaSequence = [h componentsSeparatedByString:@":"][1].integerValue;
+        }
     }
     
     for (NSInteger i = 1; i<parts.count; i++) {
@@ -123,7 +164,7 @@ static NSString * const kKFS3Key = @"kKFS3Key";
 
 - (BOOL) segmentsContainSegment: (NSString*) fileName {
     for (NSDictionary* s in self.segments) {
-        if ([s objectForKey:kFileNameKey] == fileName)
+        if ([[s objectForKey:kFileNameKey] isEqualToString:fileName])
             return YES;
     }
     
@@ -132,12 +173,12 @@ static NSString * const kKFS3Key = @"kKFS3Key";
 
 - (NSString*) nextSegmentToUpload {
     for (NSDictionary* s in self.segments) {
-        if ([s objectForKey:kUploadStatusKey] == kUploadStateUploading)
+        if ([[s objectForKey:kUploadStatusKey] isEqualToString:kUploadStateUploading])
             return nil;
     }
     
     for (NSDictionary* s in self.segments) {
-        if (/*[s objectForKey:kUploadStatusKey] != kUploadStateUploading && */[s objectForKey:kUploadStatusKey] != kUploadStateFinished)
+        if (![[s objectForKey:kUploadStatusKey] isEqualToString:kUploadStateFinished])
             return [s objectForKey:kFileNameKey];
     }
     
@@ -147,7 +188,7 @@ static NSString * const kKFS3Key = @"kKFS3Key";
 -(void) updateSegmentStatus:(NSString*)fileName status: (NSString*) status {
     for (NSInteger i = 0; i<self.segments.count; i++) {
         NSDictionary* s = self.segments[i];
-        if ([s objectForKey:kFileNameKey] == fileName) {
+        if ([[s objectForKey:kFileNameKey] isEqualToString:fileName]) {
             NSMutableDictionary* d = [NSMutableDictionary dictionaryWithDictionary:s];
             [d setValue:status forKey:kUploadStatusKey];
             [self.segments replaceObjectAtIndex:i withObject:d];
@@ -157,12 +198,20 @@ static NSString * const kKFS3Key = @"kKFS3Key";
 }
 
 -(BOOL) readyToUploadManifest {
+    int uploadedSegmentsCount = 0;
     for (NSDictionary* s in self.segments) {
-        if ([s objectForKey:kUploadStatusKey] == kUploadStateFinished)
-            return YES;
+        if ([[s objectForKey:kUploadStatusKey] isEqualToString:kUploadStateFinished]) {
+            uploadedSegmentsCount++;
+            if (uploadedSegmentsCount > 2/*self.mediaSequence + 1 */)
+                return YES;
+        }
     }
     
     return NO;
+}
+
++(int) segmentIndex:(NSString*)forFileName {
+    return [[[forFileName stringByReplacingOccurrencesOfString:@"index" withString:@""] stringByReplacingOccurrencesOfString:@".ts" withString:@""] intValue];
 }
 
 @end
@@ -171,9 +220,10 @@ static NSString * const kKFS3Key = @"kKFS3Key";
 @property (nonatomic, strong) AWSS3TransferManager *transferManager;
 @property (nonatomic, strong) AWSS3 *s3;
 @property (nonatomic, strong) KFDirectoryWatcher *directoryWatcher;
-
 @property (nonatomic, strong) AKHLSManifest *liveManifest;
-
+@property (nonatomic) double uploadRateTotal;
+@property (nonatomic) double uploadRateCount;
+@property (nonatomic) int lastUploadedSeq;
 @end
 
 @implementation AKHLSUploader
@@ -182,6 +232,9 @@ static NSString * const kKFS3Key = @"kKFS3Key";
     if (self = [super init]) {
         self.stream = stream;
         _directoryPath = [directoryPath copy];
+        
+        [[NSFileManager defaultManager] removeItemAtPath:[_directoryPath stringByAppendingPathComponent:kLiveManifestFileName] error:nil];
+        
         dispatch_async(dispatch_get_main_queue(), ^{
             self.directoryWatcher = [KFDirectoryWatcher watchFolderWithPath:_directoryPath delegate:self];
         });
@@ -193,8 +246,10 @@ static NSString * const kKFS3Key = @"kKFS3Key";
         //_nextSegmentIndexToUpload = 0;
         //_manifestReady = NO;
         //_isFinishedRecording = NO;
-        //_uploadRateTotal = 0;
-        //_uploadRateCount = 0;
+        _uploadRateTotal = 0;
+        _uploadRateCount = 0;
+        
+        _lastUploadedSeq = -1;
         
         if ([stream/*.endpoint*/ conformsToProtocol:@protocol(BroadcastS3Endpoint)]) {
             id<BroadcastS3Endpoint> s3Endpoint = (id<BroadcastS3Endpoint>)stream;//.endpoint;
@@ -221,7 +276,7 @@ static NSString * const kKFS3Key = @"kKFS3Key";
 
 - (void) directoryDidChange:(KFDirectoryWatcher *)folderWatcher {
     dispatch_async(_scanningQueue, ^{
-        NSString* content = [NSString stringWithContentsOfFile:[_directoryPath stringByAppendingPathComponent:@"index.m3u8"]
+        NSString* content = [NSString stringWithContentsOfFile:[_directoryPath stringByAppendingPathComponent:kLiveManifestFileName]
                                                       encoding:NSUTF8StringEncoding
                                                          error:NULL];
         
@@ -229,10 +284,11 @@ static NSString * const kKFS3Key = @"kKFS3Key";
             if (!_liveManifest)
                 _liveManifest = [[AKHLSManifest alloc] initWithString:content];
             else
-                [_liveManifest appendSegmentsFromString:content];
+                [_liveManifest updateFromString:content];
             
-            NSString* ss = [_liveManifest toString];
-            NSLog(ss);
+            //NSString* ss = [_liveManifest toString];
+            //NSLog(ss);
+            //NSLog(content);
         }
         
         NSString* fileName = [_liveManifest nextSegmentToUpload];
@@ -244,31 +300,7 @@ static NSString * const kKFS3Key = @"kKFS3Key";
 }
 
 - (void) uploadNextSegment:(NSString*) fileName {
-    /*NSArray *contents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:self.directoryPath error:nil];
-    NSUInteger tsFileCount = 0;
-    for (NSString *fileName in contents) {
-        if ([[fileName pathExtension] isEqualToString:@"ts"]) {
-            tsFileCount++;
-        }
-    }
-    
-    DDLogDebug(@"Attempting to queue next segment... %lld", _nextSegmentIndexToUpload);
-    NSMutableDictionary *segmentInfo = [_queuedSegments objectForKey:@(_nextSegmentIndexToUpload)];
-    NSString *fileName = [segmentInfo objectForKey:kFileNameKey];
-    NSString *fileUploadState = [_files objectForKey:fileName];
-    
-    // Skip uploading files that are currently being written
-    if (tsFileCount == 1 && !self.isFinishedRecording) {
-        DDLogDebug(@"Skipping upload of ts file currently being recorded... %@", fileName);
-        return;
-    }
-    
-    if (![fileUploadState isEqualToString:kUploadStateQueued]) {
-        DDLogDebug(@"Trying to upload file that isn't queued (is currently %@)... %@", fileUploadState, fileName);
-        return;
-    }
-    
-    [_files setObject:kUploadStateUploading forKey:fileName];*/
+
     
     NSLog(@"Uploading: %@", fileName);
     
@@ -287,7 +319,6 @@ static NSString * const kKFS3Key = @"kKFS3Key";
     
     /*__block NSDate *startUploadDate;
     uploadRequest.uploadProgress = ^(int64_t bytesSent, int64_t totalBytesSent, int64_t totalBytesExpectedToSend) {
-        NSUInteger queuedSegmentsCount = _queuedSegments.count;
         
         if (bytesSent == totalBytesSent) {
             startUploadDate = [NSDate date];
@@ -302,19 +333,20 @@ static NSString * const kKFS3Key = @"kKFS3Key";
             _uploadRateCount += 1;
             double averageUploadSpeed = _uploadRateTotal / _uploadRateCount;
             
-            DDLogVerbose(@"Speed: %f kbps Average Speed: %f bytesSent: %d", kbps, averageUploadSpeed, bytesSent);
+            NSLog(@"Speed: %f kbps Average Speed: %f bytesSent: %d", kbps, averageUploadSpeed, bytesSent);
             
-            if ([self.delegate respondsToSelector:@selector(uploader:didUploadPartOfASegmentAtUploadSpeed:)]) {
-                //[self.delegate uploader:self didUploadPartOfASegmentAtUploadSpeed:kbps];
+            if (self.delegate && [self.delegate respondsToSelector:@selector(uploader:didUploadSegmentAtURL:uploadSpeed:numberOfQueuedSegments:)]) {
+                dispatch_async(self.callbackQueue, ^{
+                    [self.delegate uploader:self didUploadSegmentAtURL:nil uploadSpeed:kbps numberOfQueuedSegments:0];
+                });
             }
+            
+            //if ([self.delegate respondsToSelector:@selector(uploader:didUploadPartOfASegmentAtUploadSpeed:)]) {
+                //[self.delegate did uploader:self didUploadPartOfASegmentAtUploadSpeed:kbps];
+            //}
         }
-    };
+    };*/
     
-    // Set the 'uploadStartDate' here, just before being added to the queue, instead of where the segmentInfo is created
-    // Gives more accurate upload speed readings
-    [segmentInfo setObject:[NSDate date] forKey:kFileStartDateKey];
-    
-    DDLogDebug(@"Queueing ts... %@", fileName);*/
     
     [[self.transferManager upload:uploadRequest] continueWithBlock:^id(AWSTask *task) {
         if (task.error) {
@@ -333,7 +365,14 @@ static NSString * const kKFS3Key = @"kKFS3Key";
                 [self uploadNextSegment:nextFileName];
             }
             
-            [self updateRemoteManifestWithString:[_liveManifest toString] manifestName:kLiveManifestFileName];
+            if ([_liveManifest readyToUploadManifest] ) {//&& _lastUploadedSeq != _liveManifest.mediaSequence)
+                [self updateRemoteManifestWithString:[_liveManifest toStringForSeq:_lastUploadedSeq+1] manifestName:kLiveManifestFileName];
+                _lastUploadedSeq = _liveManifest.mediaSequence;
+                
+                NSString* ss = [_liveManifest toStringForSeq:_lastUploadedSeq];
+                NSLog(ss);
+                
+            }
         }
         return nil;
     }];
@@ -355,6 +394,9 @@ static NSString * const kKFS3Key = @"kKFS3Key";
     uploadRequest.contentType = @"application/x-mpegURL";
     uploadRequest.contentLength = @(data.length);
     //DDLogDebug(@"Queueing manifest... %@", manifestName);
+    
+    //_lastUploadedSeq = _liveManifest.mediaSequence;
+    
     [[self.s3 putObject:uploadRequest] continueWithBlock:^id(AWSTask *task) {
         if (task.error) {
             //[self s3RequestFailedForFileName:manifestName withError:task.error];

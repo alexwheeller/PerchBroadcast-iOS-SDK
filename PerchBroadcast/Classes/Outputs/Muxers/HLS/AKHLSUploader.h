@@ -13,7 +13,8 @@
 #import "BroadcastStream.h"
 #import "KFHLSUploader.h"
 
-@class KFS3Stream, KFHLSUploader;
+@class KFS3Stream;
+
 
 @interface AKHLSUploader : NSObject <KFDirectoryWatcherDelegate>
 
